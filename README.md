@@ -44,7 +44,7 @@ If you want to run RegMixMatch algorithm:
 
 
 ## USB
-If you are interested in this project, we also recommend using the [USB](https://github.com/microsoft/Semi-supervised-learning) benchmark to get the results, achieving better outcomes with less training time.
+If you are interested in this project, we also recommend using the [USB](https://github.com/microsoft/Semi-supervised-learning) benchmark to get the results, achieving better outcomes with less training time. You can replace the corresponding files with the files in the usb folder.
 
 ## References
 
