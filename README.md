@@ -42,6 +42,10 @@ If you want to run RegMixMatch algorithm:
 1. Modify the config file in `config/freematch_entropy/freematch_entropy_xx_xx_xx.yaml` as you need
 2. Run `python freematch_entropy.py --c config/freematch_entropy/freematch_entropy_xx_xx_xx.yaml`
 
+
+## USB
+If you are interested in this project, we also recommend using the [USB](https://github.com/microsoft/Semi-supervised-learning) benchmark to get the results, achieving better outcomes with less training time.
+
 ## References
 
 
