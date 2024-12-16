@@ -205,6 +205,27 @@ def resizemix_cam(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=1
     return x, y, lam
 
 
+def resizemix_l(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha=1.0,interpolate_mode="nearest"):
+    x_resize = x_h.clone()
+    bs, _, h, w = x.size()
+    tao = np.random.beta(alpha, alpha)
+    tao = np.sqrt(tao)
+    tao = scope[0] + tao*(scope[1]-scope[0])
+    # tao = np.random.uniform(scope[0], scope[1])
 
-
-
+    # random box
+    bbx1, bby1, bbx2, bby2 = rand_bbox_tao(x.size(), tao)
+    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (w * h))
+    # center crop first
+    crop_h, crop_w = int(h * crop_ratio), int(w * crop_ratio)
+    start_h, start_w = (h - crop_h) // 2, (w - crop_w) // 2
+    x_resize = x_resize[:, :, start_h:start_h+crop_h, start_w:start_w+crop_w]
+    # resize
+    x_resize = interpolate(
+        x_resize, (bby2 - bby1, bbx2 - bbx1), mode=interpolate_mode
+    )
+    class_indices = torch.randint(0, len(x_h), (len(x),)).view(-1)
+    x[:, :, bby1:bby2, bbx1:bbx2] = x_resize[class_indices]
+    y = lam * y + (1 - lam) * y_h[class_indices]
+        
+    return x, y, lam
