@@ -14,6 +14,8 @@ hard_label: True
 T: 0.5
 ulb_loss_ratio: 1.0
 ent_loss_ratio: 0.01
+tau_m: 0.99
+disab_cam: False
 uratio: 7
 ema_m: 0.999
 optim: SGD

@@ -14,8 +14,10 @@ hard_label: True
 T: 0.5
 ulb_loss_ratio: 1.0
 ent_loss_ratio: 0.01
+tau_m: 0.99
 uratio: 7
 ema_m: 0.999
+disab_cam: True
 optim: SGD
 lr: 0.03
 momentum: 0.9
