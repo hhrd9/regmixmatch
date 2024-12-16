@@ -18,7 +18,7 @@ import os
 import contextlib
 from train_utils import AverageMeter
 
-from .freematch_utils import entropy_loss, consistency_loss, Get_Scalar, one_hot, l2_loss, resizemix_cam, resizemix
+from .freematch_utils import entropy_loss, consistency_loss, Get_Scalar, one_hot, l2_loss, resizemix_cam, resizemix, resizemix_l
 from train_utils import ce_loss, wd_loss, EMA, Bn_Controller
 
 from sklearn.metrics import *
@@ -253,15 +253,18 @@ class FreeMatch:
                 time_p, p_model, label_hist = self.cal_time_p_and_p_model(logits_x_ulb_w, time_p, p_model, label_hist)
                 unsup_loss, mask, pseudo_lb, valid_indices, prob_w, max_probs = consistency_loss(args.dataset, logits_x_ulb_s,logits_x_ulb_w,
                                                     p_target,time_p,p_model,
-                                                    'ce', tau_m=0.999, use_hard_labels=args.hard_label)
+                                                    'ce', tau_m=args.tau_m, use_hard_labels=args.hard_label)
                 conf_labels = torch.cat(
                         [one_hot(y_lb, args.num_classes, args.gpu), one_hot(pseudo_lb[valid_indices], args.num_classes, args.gpu)], dim=0)
                 conf_data = torch.cat([x_lb, x_ulb_s[valid_indices]])
 
                 # mixup for predicted_class data
-                mixed_x_sc, mixed_y_sc, _ = resizemix_cam(x_ulb_s[~valid_indices], prob_w[~valid_indices], 
-                                                                       conf_data, conf_labels, args.gpu, alpha_l=16.0)
-                
+                if np.random.rand() < 0.5:
+                    mixed_x_sc, mixed_y_sc, _ = resizemix_cam(x_ulb_s[~valid_indices], prob_w[~valid_indices], 
+                                                                           conf_data, conf_labels, args.gpu, alpha_l=16.0)
+                else:
+                    mixed_x_sc, mixed_y_sc, _ = resizemix_l(x_ulb_s[~valid_indices], prob_w[~valid_indices], 
+                                                                           conf_data, conf_labels, args.gpu, alpha_l=16.0)
                 if args.num_labels/args.num_classes >= 100:
                     mixed_x, mixed_y, _ = resizemix(conf_data, conf_labels, args.gpu, alpha_h=1.0)
                 else:
@@ -269,16 +272,22 @@ class FreeMatch:
                                                     one_hot(pseudo_lb[valid_indices], args.num_classes, args.gpu), 
                                                     args.gpu, alpha_h=1.0)
  
-
                 num_cert = mixed_x.shape[0]
                 num_uncert = mixed_x_sc.shape[0]
-                mix_s = torch.cat([mixed_x, mixed_x_sc], dim=0)
-                logits_mix = self.model(mix_s)
-                logits_mix_cert = logits_mix[:num_cert]
-                logits_mix_inclass = logits_mix[num_cert:]
-                mix_loss = ce_loss(logits_mix_cert, mixed_y, use_hard_labels=False).sum()/num_ulb
-                cam_loss = l2_loss(logits_mix_inclass, mixed_y_sc)*max_probs[~valid_indices]*max_probs[~valid_indices]*max_probs[~valid_indices]
-                cam_loss = cam_loss.mean()
+                ## Trade-off between performance and training time.
+                if args.disab_cam:
+                    logits_mix = self.model(mixed_x)
+                    logits_mix_cert = logits_mix
+                    mix_loss = ce_loss(logits_mix_cert, mixed_y, use_hard_labels=False).sum()/num_ulb
+                    cam_loss = 0
+                else:
+                    mix_s = torch.cat([mixed_x, mixed_x_sc], dim=0)
+                    logits_mix = self.model(mix_s)
+                    logits_mix_cert = logits_mix[:num_cert]
+                    logits_mix_inclass = logits_mix[num_cert:]
+                    mix_loss = ce_loss(logits_mix_cert, mixed_y, use_hard_labels=False).sum()/num_ulb
+                    cam_loss = l2_loss(logits_mix_inclass, mixed_y_sc)*max_probs[~valid_indices]*max_probs[~valid_indices]*max_probs[~valid_indices]
+                    cam_loss = cam_loss.mean()
 
                 
                 ent_loss, ps_label_hist = entropy_loss(mask, logits_x_ulb_s, logits_x_ulb_w, p_model, label_hist)
