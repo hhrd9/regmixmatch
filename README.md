@@ -33,7 +33,7 @@ This is an PyTorch implementation of RegMixMatch. Note that all our baseline is 
 Before running or modifing the code, you need to:
 1. Clone this repo to your machine.
 2. Make sure Anaconda or Miniconda is installed.
-3. Run `conda env create -f environment.yml` for environment initialization.
+3. Run `conda env create -f environment.yml` or `conda env create -f environment3090.yml` for environment initialization, activate environment.
 
 ### Run the experiments
 As introduced in paper, we implement RegMixMatch based on FreeMatch [1].
