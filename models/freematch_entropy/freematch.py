@@ -319,7 +319,6 @@ class FreeMatch:
             tb_dict = {}
             tb_dict['train/sup_loss'] = sup_loss.item()
             tb_dict['train/srm_loss'] = srm_loss.item()
-            tb_dict['train/cam_loss'] = cam_loss.item()
             tb_dict['train/ent_loss'] = ent_loss.item()
             tb_dict['train/total_loss'] = total_loss.item()
             tb_dict['train/time_p'] = time_p.item()
