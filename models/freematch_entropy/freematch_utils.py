@@ -165,7 +165,7 @@ def rand_bbox_tao(size, tao):
     return bbx1, bby1, bbx2, bby2
 
 
-def resizemix_cam(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=1.0,interpolate_mode="nearest"):
+def resizemix_cam(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=16.0,interpolate_mode="nearest"):
 
     x_resize = x_h.clone()
     _, _, h, w = x.size()
@@ -205,7 +205,7 @@ def resizemix_cam(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=1
     return x, y, lam
 
 
-def resizemix_l(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha=1.0,interpolate_mode="nearest"):
+def resizemix_l(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=16.0,interpolate_mode="nearest"):
     x_resize = x_h.clone()
     bs, _, h, w = x.size()
     tao = np.random.beta(alpha, alpha)
