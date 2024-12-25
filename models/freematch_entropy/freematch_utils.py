@@ -208,7 +208,7 @@ def resizemix_cam(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=1
 def resizemix_l(x, y, x_h, y_h, gpu, crop_ratio=0.9,scope=(0.1, 0.8),alpha_l=16.0,interpolate_mode="nearest"):
     x_resize = x_h.clone()
     bs, _, h, w = x.size()
-    tao = np.random.beta(alpha, alpha)
+    tao = np.random.beta(alpha_l, alpha_l)
     tao = np.sqrt(tao)
     tao = scope[0] + tao*(scope[1]-scope[0])
     # tao = np.random.uniform(scope[0], scope[1])
