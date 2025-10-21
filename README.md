@@ -46,7 +46,11 @@ If you want to run RegMixMatch algorithm:
 ## USB
 If you are interested in this project, we highly recommend using the [USB](https://github.com/microsoft/Semi-supervised-learning) benchmark to get the results, achieving better outcomes with less training time. You can replace the corresponding files with the files in the usb folder.
 
+## new and important!!
+Subsequent experiments revealed that CAM does not consistently improve performance and may even lead to degradation in certain cases. Given the relatively limited gains and potential risks, we recommend keeping disab_cam=True throughout training for safety.
+
+
 ## References
-
-
 [1] Yidong Wang, Hao Chen, Qiang Heng, Wenxin Hou, Yue Fan, Zhen Wu, Jindong Wang, Marios Savvides, Takahiro Shinozaki, Bhiksha Raj, Bernt Schiele, Xing Xie. FreeMatch: Self-adaptive Thresholding for Semi-supervised Learning. ICLR, 2023.
+
+
